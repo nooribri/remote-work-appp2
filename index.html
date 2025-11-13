@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0d47a1">
+
+<!-- لأجهزة أبل (آيفون/آيباد) -->
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <title>العمل عن بعد - تسجيل دخول</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      padding: 60px 20px;
+    }
+
+    .login-box {
+      max-width: 400px;
+      margin: 100px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+     .login-container {
+      width: 300px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    .login-container input {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .login-container button {
+      background-color: #0d47a1;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .login-container button:hover {
+      background-color: #1565c0;
+    }
+
+    .login-container h3 {
+      font-weight: 800;
+      font-size: 20px;
+      color: #0d47a1;
+      margin-bottom: 20px;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 20px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 12px 30px;
+      background-color: #26a69a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    .menu-area {
+      display: none;
+      padding-top: 60px;
+    }
+
+    .menu-icons {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+
+    .icon-box {
+      width: 150px;
+      height: 150px;
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #333;
+      transition: transform 0.2s ease;
+    }
+
+    .icon-box:hover {
+      transform: translateY(-5px);
+    }
+
+    .icon-box img {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin-bottom: 30px;
+      color: #00796b;
+    }
+  </style>
+  <script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("service-worker.js")
+      .then(function (registration) {
+        console.log("ServiceWorker registered with scope:", registration.scope);
+      })
+      .catch(function (error) {
+        console.log("ServiceWorker registration failed:", error);
+      });
+  });
+}
+</script>
+
+</head>
+<body>
+
+  <div class="container">
+    <div class="login-box" id="loginBox">
+      <h2>تسجيل دخول الموظف</h2>
+      <input type="text" id="loginId" placeholder="أدخل الرقم الوظيفي" required>
+      <button onclick="login()">دخول</button>
+    </div>
+
+    <div class="menu-area" id="menuArea">
+      <h2>مرحباً بك، <span id="empName"></span></h2>
+      <div class="menu-icons">
+        <a href="form.html" class="icon-box">
+          <img src="https://images.icon-icons.com/452/PNG/96/Tasks_43553.png" alt="ألعمل عن بعد">
+          <span>ألعمل عن بعد</span>
+        </a>
+         <a href="form1.html" class="icon-box">
+          <img src="https://images.icon-icons.com/1482/PNG/96/20business-planning_102142.png" alt="مهمة عمل">
+          <span>مهمة عمل</span>
+        </a>
+        <a href="report.html" class="icon-box">
+          <img src="https://images.icon-icons.com/20/PNG/96/trade_report_reports_documents_2351.png" alt="تقرير العمل عن بعد">
+          <span>تقرير العمل عن بعد</span>
+        </a>
+
+         <a href="report1.html" class="icon-box">
+          <img src="https://images.icon-icons.com/46/PNG/96/korganizer_task_tasks_list_9500.png" alt="تقرير مهمة عمل">
+          <span>تقرير مهمة عمل </span>
+        </a>
+      </div>
+    </div>
+  </div>
+ </div>
+
+   <script>
+ function login() {
+  const empInput = document.getElementById('loginId'); // الاسم الصحيح هنا
+  const id = empInput.value.trim();
+
+  const allowedIDs = ['376', '373','5011','2271', '5010','575','79','37','366','5014','525','358','350','356','364',
+  '367','578','731','783','375','361','369','370','875','876','1043','38','501','555','560','825','865','751','1024',
+  '300','2130','1089','351','353','354','355','360','362','363','365','368','374','654','732','757','803','815','957',
+  '418','372','804','2169','1112','2231','923','1033','673','1116','2157','832','945','548','974','357'];
+
+  if (allowedIDs.includes(id)) {
+    empInput.value = '';
+    empInput.style.display = 'none';
+
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('menuArea').style.display = 'block';
+
+    sessionStorage.setItem('authenticated', 'true');
+    document.getElementById('empName').textContent = id; // عرض الرقم أو الاسم لاحقاً
+  } else {
+    alert('غير مصرح لك بالدخول.');
+  }
+}
+
+    window.onload = function () {
+      localStorage.removeItem("employeeId");
+      localStorage.removeItem("employeeName");
+      document.getElementById("loginBox").style.display = "block";
+      document.getElementById("menuArea").style.display = "none";
+    };
+  </script>
+
+</body>
+</html>

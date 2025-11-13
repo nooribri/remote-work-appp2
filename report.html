@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>تقاريري</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .header {
+      margin-top: 30px;
+      margin-bottom: 25px;
+    }
+
+    .header h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+    }
+
+    .search-container input {
+      padding: 12px 40px 12px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 320px;
+      direction: rtl;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      direction: rtl;
+      margin-bottom: 60px;
+    }
+
+    th {
+      background-color: #26a69a;
+      color: white;
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: #e0f7f7;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #ffffff;
+    }
+
+    td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+  @media print {
+  /* إخفاء البحث والفلترة */
+  .search-container {
+    display: none !important;
+  }
+
+  /* إخفاء أزرار الطباعة والتصدير والرجوع */
+  #buttons {
+    display: none !important;
+  }
+
+  /* إخفاء عمود الإجراءات */
+  th:last-child,
+  td:last-child {
+    display: none !important;
+  }
+}
+
+@media print {
+  @page {
+    margin: 10mm; /* تقدر تقللها أكثر */
+  }
+
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+
+    button {
+      margin: 5px;
+      padding: 8px 16px;
+      background-color: #26a69a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background-color: #00796b;
+    }
+
+    .delete-button {
+      color: red;
+      font-weight: bold;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    #buttons {
+      position: fixed;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 95vw;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h2>تقرير العمل عن بعد</h2>
+  </div>
+
+ <div class="search-container">
+  <select id="departmentFilter" onchange="filterByDepartment()" style="padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+    <option value="">📂 عرض جميع الأقسام</option>
+    <option>قسم مكتب المدير</option>
+    <option>قسم تقنية المعلومات</option>
+    <option>قسم الشؤون الإدارية والمالية</option>
+    <option>قسم الدراسات والتطوير</option>
+    <option>قسم الشكاوى</option>
+    <option>قسم التنظيم ومراقبة الأسواق</option>
+    <option>قسم التواصل والإعلام</option>
+    <option>قسم الشؤون القانونية</option>
+  </select>
+
+  <input type="text" id="searchInput" placeholder="🔍 ابحث في كل الحقول">
+</div>
+
+
+  <table id="reportTable">
+    <thead>
+      <tr>
+        <th>الرقم الوظيفي</th>
+        <th>اسم الموظف</th>
+        <th>القسم</th>
+        <th>البريد الإلكتروني</th>
+        <th>التاريخ</th>
+        <th>نوع العمل</th>
+        <th>ملاحظات</th>
+        <th>إرفاق مستند</th>
+        <th class="no-print">الإجراء</th>
+      </tr>
+    </thead>
+    <tbody id="reportBody"></tbody>
+  </table>
+
+  <div id="buttons">
+    <button onclick="window.print()">طباعة التقرير</button>
+    <button onclick="exportTableToExcel('reportTable', 'تقاريري')">تصدير إلى Excel</button>
+    <button onclick="goBack()">الرجوع للصفحة السابقة</button>
+  </div>
+<script>
+  const sheetEndpoint = "https://script.google.com/macros/s/AKfycbyqJ7ng53j-UD7wBeyuuk6dmLjFSuRXnLf5YB_SoAz-oLXNA5xQ4asPhT4LarC8Wh9vVA/exec";
+
+  let allData = [];
+
+  function loadData() {
+    fetch(sheetEndpoint + "?action=getData")
+      .then(res => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then(data => {
+        console.log("تم جلب البيانات:", data);
+        allData = data;
+        displayData(allData);
+      })
+      .catch(err => {
+        console.error("خطأ في جلب البيانات:", err);
+        alert("❌ فشل تحميل البيانات");
+      });
+  }
+
+ function displayData(data) {
+  const body = document.getElementById("reportBody");
+  body.innerHTML = "";
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${row.jobNumber || ""}</td>
+      <td>${row.employeeName || ""}</td>
+      <td>${row.department || ""}</td>
+      <td>${row.email || ""}</td>
+      <td>${formatDate(row.date)}</td>
+      <td>${row.workType || ""}</td>
+      <td>${row.notes || ""}</td>
+      <td>
+        ${row.fileUrl && row.fileUrl.startsWith("http")
+          ? `<a href="${row.fileUrl}" target="_blank">📎 عرض المستند</a>`
+          : "لا يوجد"}
+      </td>
+      <td class="no-print">
+        <button onclick="confirmDelete(${row.rowNum})" class="delete-button">🗑 حذف</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+
+
+  document.getElementById("searchInput").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll("#reportTable tbody tr");
+    rows.forEach(row => {
+      const match = Array.from(row.children).some(cell =>
+        cell.textContent.toLowerCase().includes(filter)
+      );
+      row.style.display = match ? "" : "none";
+    });
+  });
+
+  function filterByDepartment() {
+    const selectedDept = document.getElementById("departmentFilter").value;
+    const filteredData = selectedDept
+      ? allData.filter(row => row.department === selectedDept)
+      : allData;
+
+    displayData(filteredData);
+  }
+function filterTable() {
+  const jobNumberInput = document.getElementById("searchJobNumber").value.trim().toLowerCase();
+  const nameInput = document.getElementById("searchEmployeeName").value.trim().toLowerCase();
+  const rows = document.querySelectorAll("#employeeTable tbody tr");
+
+  rows.forEach(row => {
+    const jobNumber = row.cells[0].textContent.toLowerCase();
+    const name = row.cells[1].textContent.toLowerCase();
+
+    // البحث يعمل إذا تحقق أحد الشرطين أو كلاهما
+    const matchJob = jobNumber.includes(jobNumberInput);
+    const matchName = name.includes(nameInput);
+
+    // إذا كلا الحقلين فارغين، نظهر كل الصفوف
+    if (!jobNumberInput && !nameInput) {
+      row.style.display = "";
+    } else if (matchJob || matchName) {
+      row.style.display = "";
+    } else {
+      row.style.display = "none";
+    }
+  });
+}
+
+  function exportTableToExcel(tableID, filename = '') {
+    const table = document.getElementById(tableID);
+    const html = table.outerHTML;
+    const blob = new Blob(["\ufeff", html], { type: "application/vnd.ms-excel" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename ? filename + '.xls' : 'تقرير.xls';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    if (!isNaN(dateStr)) {
+      const date = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
+      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    }
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+  }
+
+  function confirmDelete(rowNum) {
+    if (confirm("هل أنت متأكد أنك تريد حذف هذا الصف؟")) {
+      deleteRow(rowNum);
+    }
+  }
+
+  function deleteRow(rowNum) {
+    fetch(sheetEndpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        action: "delete",
+        rowNum: rowNum
+      })
+    })
+      .then(res => res.json())
+      .then(result => {
+        if (result.status === "success") {
+          alert("✅ تم حذف الصف بنجاح");
+          loadData();
+        } else {
+          alert("❌ فشل الحذف: " + result.message);
+        }
+      })
+      .catch(() => alert("❌ خطأ في الاتصال بالخادم"));
+  }
+
+  loadData();
+</script>
+
+</body>
+</html>
